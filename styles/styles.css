@@ -57,20 +57,29 @@ body {
 
 .buttons {
     display: flex;
-    flex-direction: column;
+    flex-wrap: wrap;
 }
 
 .operand {
     background-color: #578a59;
 }
 
+.clear-buttons {
+    background-color: #b6c33f;
+}
+
 .numbers {
     display: flex;
     flex-wrap: wrap;
-    width: 24%;
+    width: 23%;
 }
 
 .actions {
     margin-bottom: 5px;
+    display: flex;
+    width: 100%;
+}
+
+.clear-button-container {
     display: flex;
 }

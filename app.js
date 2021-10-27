@@ -4,11 +4,15 @@ let screenContainerEl = document.querySelector('#screen');
 let actionsContainerEl = document.querySelector('#action-list');
 let operandsContainerEl = document.querySelector('#number-list');
 let calcContainerEL = document.querySelector('#calc');
+let buttonContainerEl = document.querySelector('#button-container');
+let buttonContainerForClearingEL = document.querySelector('#clear-container');
+let lastChildEl = document.querySelector('#screen:last-child');
 
 function Calculator () {
 
     this.operators = ['+','-','/','*','='];
     this.numbers = [1,2,3,4,5,6,7,8,9,0];
+    this.buttonsForClearingContent = ['C','X'];
 
     this.addClassList = function (element,className) {
         element.classList.add(`${className}`);
@@ -29,6 +33,16 @@ function Calculator () {
         this.appendElements(itemOnScreen,appendPlaceName);
     };
 
+    this.clearContentFromContainer = function (passedContainer) {
+        let containerToBeCleared = passedContainer;
+        containerToBeCleared.innerHTML = '';
+    }
+
+    this.clearOnlyOneElementFromContainer = function (passedElement) {
+        let elementToBeCLeared = passedElement;
+        elementToBeCLeared.removeChild(elementToBeCLeared.lastChild);
+    }
+
     this.onClickOperators = function (e) {
         console.log(e.target)
         console.log(this);
@@ -36,13 +50,13 @@ function Calculator () {
         let itemOperator = e.target.closest('.operator');
         let itemOperatorTextContent = e.target.textContent;
 
-        console.log(itemOperator);
+        // console.log(itemOperator);
 
         if(e.target.classList.contains('operator')) {
             this.showElementOnScreen(itemOperatorTextContent,screenContainerEl,'span','screen-process_element');
             // do something with operators
             if (this.operators.includes(e.target.textContent)) {
-                console.log(e.target.textContent);
+                // console.log(e.target.textContent);
 
                 this.operators.forEach(el => {
                     if (e.target.textContent === el) {
@@ -56,14 +70,37 @@ function Calculator () {
     this.onClickOperands = function (e) {
             let itemOperand = e.target.closest('.operand');
             let itemOperandTextContent = e.target.textContent;
-            console.log(itemOperand);
-            console.log(e);
             this.numbers.forEach(el => {
                 if (e.target.textContent == el) {
                    console.log(el);
                    this.showElementOnScreen(itemOperandTextContent,screenContainerEl,'span','screen-process_element');
                 }
             });
+    }
+
+    this.onClickButtonsForClearingContent = function (e) {
+        // let closetEL = e.target.closest('.clear-buttons');
+        if (e.target.textContent === this.buttonsForClearingContent[0]) {
+            console.log(e.target.textContent);
+            console.log(this.buttonsForClearingContent[0]);
+            this.clearContentFromContainer(screenContainerEl);
+        } else if (e.target.textContent === this.buttonsForClearingContent[1]) {
+            console.log(e.target.textContent);
+            console.log(this.buttonsForClearingContent[1]);
+            this.clearOnlyOneElementFromContainer(screenContainerEl);
+        }
+        // this.buttonsForClearingContent.forEach((elem,i,array) => {
+        //     if (e.target.textContent === array[0]) {
+        //         console.log(elem);
+        //         // console.log(array[0]);
+        //         // console.log(e)
+        //         this.clearContentFromContainer(screenContainerEl);
+        //     } else if (e.target.textContent === array[1]) {
+        //         console.log(array[1]);
+        //         this.clearOnlyOneElementFromContainer(screenContainerEl);
+        //         // console.log(screenContainerEl.children.length)
+        //     }
+        // })
     }
     
     this.renderElements = function (elementsReceived,appendPlace,tag,className1,className2) {
@@ -78,9 +115,11 @@ function Calculator () {
     
     this.renderElements(this.numbers,operandsContainerEl,'button','button','operand');
     this.renderElements(this.operators,actionsContainerEl,'button','button','operator');
+    this.renderElements(this.buttonsForClearingContent,buttonContainerForClearingEL,'button','button','clear-buttons')
 
     calcContainerEL.addEventListener('click',this.onClickOperators.bind(this));
     calcContainerEL.addEventListener('click',this.onClickOperands.bind(this));
+    calcContainerEL.addEventListener('click',this.onClickButtonsForClearingContent.bind(this));
 
 }
 

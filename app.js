@@ -24,49 +24,47 @@ function Calculator () {
 
     this.showElementOnScreen = function (passedTarget, appendPlaceName,tagName,nameOfClass) {
         let itemOnScreen = document.createElement(tagName);
-        this.addClassList(itemOnScreen,nameOfClass);
+        this.addClassList(itemOnScreen,nameOfClass)
         this.addTextContent(itemOnScreen,passedTarget);
-        this.appendElements(appendPlaceName,itemOnScreen);
+        this.appendElements(itemOnScreen,appendPlaceName);
     };
 
-    // this.onClickOperators = function (givenArray,givenFunction) {
-    //     return function(e) {
-    //         let itemOperator = e.target.closest('.operator');
-    //         console.log(this);
-    //         console.log(itemOperator);
-    //         console.log(e);
-    //         givenArray.forEach(el => {
-    //             if (e.target.textContent === el) {
-    //                console.log(el);
-    //                givenFunction(itemOperator,screenContainerEl,'span','screen-process_element');
-    //             }
-    //         });
-    //     }
-    // };
-
     this.onClickOperators = function (e) {
-        let itemOperator = e.target.closest('.operator');
+        console.log(e.target)
         console.log(this);
+
+        let itemOperator = e.target.closest('.operator');
+        let itemOperatorTextContent = e.target.textContent;
+
         console.log(itemOperator);
-        console.log(e);
-        if (this.operators.includes(e.target.textContent)) {
-            console.log(e.target.textContent);
+
+        if(e.target.classList.contains('operator')) {
+            this.showElementOnScreen(itemOperatorTextContent,screenContainerEl,'span','screen-process_element');
+            // do something with operators
+            if (this.operators.includes(e.target.textContent)) {
+                console.log(e.target.textContent);
+
+                this.operators.forEach(el => {
+                    if (e.target.textContent === el) {
+                        console.log(el);
+                    }
+                });
+            }
         }
     };
 
-    // this.onClickOperands = function (givenArray2,givenFunction2) {
-    //     return function X(e) {
-    //         let itemOperand = e.target.closest('.operand');
-    //         console.log(itemOperand);
-    //         console.log(e);
-    //         givenArray2.forEach(el => {
-    //             if (e.target.textContent == el) {
-    //                console.log(el);
-    //                givenFunction2(itemOperand,screenContainerEl,'span','screen-process_element');
-    //             }
-    //         });
-    //     }
-    // };
+    this.onClickOperands = function (e) {
+            let itemOperand = e.target.closest('.operand');
+            let itemOperandTextContent = e.target.textContent;
+            console.log(itemOperand);
+            console.log(e);
+            this.numbers.forEach(el => {
+                if (e.target.textContent == el) {
+                   console.log(el);
+                   this.showElementOnScreen(itemOperandTextContent,screenContainerEl,'span','screen-process_element');
+                }
+            });
+    }
     
     this.renderElements = function (elementsReceived,appendPlace,tag,className1,className2) {
         elementsReceived.forEach(e => {
@@ -81,8 +79,8 @@ function Calculator () {
     this.renderElements(this.numbers,operandsContainerEl,'button','button','operand');
     this.renderElements(this.operators,actionsContainerEl,'button','button','operator');
 
-    calcContainerEL.addEventListener('click',this.onClickOperators);
-    // calcContainerEL.addEventListener('click',this.onClickOperands(this.numbers,this.showElementOnScreen));
+    calcContainerEL.addEventListener('click',this.onClickOperators.bind(this));
+    calcContainerEL.addEventListener('click',this.onClickOperands.bind(this));
 
 }
 

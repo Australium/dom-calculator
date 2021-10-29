@@ -13,6 +13,8 @@ function Calculator () {
     this.operators = ['+','-','/','*','='];
     this.numbers = [1,2,3,4,5,6,7,8,9,0];
     this.buttonsForClearingContent = ['C','X'];
+    this.storedOperands = [];
+    this.storedOperator = null;
 
     this.addClassList = function (element,className) {
         element.classList.add(`${className}`);
@@ -26,6 +28,12 @@ function Calculator () {
         whereToAppend.append(elementToAppend);
     };
 
+    this.addListeners = function (element,typeOfEvent,handler,thisForBind) {
+        thisForBind !== undefined ? 
+        element.addEventListener(typeOfEvent,handler.bind(thisForBind)) :
+        element.addEventListener(typeOfEvent,handler);
+    };
+
     this.showElementOnScreen = function (passedTarget, appendPlaceName,tagName,nameOfClass) {
         let itemOnScreen = document.createElement(tagName);
         this.addClassList(itemOnScreen,nameOfClass)
@@ -36,12 +44,32 @@ function Calculator () {
     this.clearContentFromContainer = function (passedContainer) {
         let containerToBeCleared = passedContainer;
         containerToBeCleared.innerHTML = '';
-    }
+    };
 
     this.clearOnlyOneElementFromContainer = function (passedElement) {
         let elementToBeCLeared = passedElement;
         elementToBeCLeared.removeChild(elementToBeCLeared.lastChild);
-    }
+    };
+
+    this.addOperandsToArray = function (passedArray,passedElement) {
+        passedArray.push(passedElement);
+    };
+
+    this.clearArray = function (passedArray) {
+        passedArray.splice(0,passedArray.length);
+    };
+
+    this.clearArrayElement = function (passedArray) {
+        passedArray.pop();
+    };
+
+    // this.calculate = function (array,passedEvent) {
+    //     array.forEach(element => {
+    //         if (passedEvent.target.textContent === element) {
+                
+    //         }
+    //     })
+    // };
 
     this.onClickOperators = function (e) {
         console.log(e.target)
@@ -50,13 +78,14 @@ function Calculator () {
         let itemOperator = e.target.closest('.operator');
         let itemOperatorTextContent = e.target.textContent;
 
-        // console.log(itemOperator);
-
         if(e.target.classList.contains('operator')) {
             this.showElementOnScreen(itemOperatorTextContent,screenContainerEl,'span','screen-process_element');
             // do something with operators
             if (this.operators.includes(e.target.textContent)) {
-                // console.log(e.target.textContent);
+
+                // if(e.target.textContent === '=') {
+                //     this.calculate();
+                // };
 
                 this.operators.forEach(el => {
                     if (e.target.textContent === el) {
@@ -70,24 +99,29 @@ function Calculator () {
     this.onClickOperands = function (e) {
             let itemOperand = e.target.closest('.operand');
             let itemOperandTextContent = e.target.textContent;
-            this.numbers.forEach(el => {
-                if (e.target.textContent == el) {
-                   console.log(el);
-                   this.showElementOnScreen(itemOperandTextContent,screenContainerEl,'span','screen-process_element');
+            this.numbers.forEach((el,i,array) => {
+                if (itemOperandTextContent == el) {
+                    console.log(el);
+                    this.showElementOnScreen(itemOperandTextContent,screenContainerEl,'span','screen-process_element');
+                    // this.storedOperands.push(el);
+                    this.addOperandsToArray(this.storedOperands,el);
+                    console.log(this.storedOperands);
                 }
             });
-    }
+    };
 
     this.onClickButtonsForClearingContent = function (e) {
         // let closetEL = e.target.closest('.clear-buttons');
         if (e.target.textContent === this.buttonsForClearingContent[0]) {
             console.log(e.target.textContent);
-            console.log(this.buttonsForClearingContent[0]);
             this.clearContentFromContainer(screenContainerEl);
+            this.clearArray(this.storedOperands);
+            console.log(this.storedOperands);
         } else if (e.target.textContent === this.buttonsForClearingContent[1]) {
             console.log(e.target.textContent);
-            console.log(this.buttonsForClearingContent[1]);
             this.clearOnlyOneElementFromContainer(screenContainerEl);
+            this.clearArrayElement(this.storedOperands);
+            console.log(this.storedOperands);
         }
         // this.buttonsForClearingContent.forEach((elem,i,array) => {
         //     if (e.target.textContent === array[0]) {
@@ -101,7 +135,7 @@ function Calculator () {
         //         // console.log(screenContainerEl.children.length)
         //     }
         // })
-    }
+    };
     
     this.renderElements = function (elementsReceived,appendPlace,tag,className1,className2) {
         elementsReceived.forEach(e => {
@@ -115,12 +149,11 @@ function Calculator () {
     
     this.renderElements(this.numbers,operandsContainerEl,'button','button','operand');
     this.renderElements(this.operators,actionsContainerEl,'button','button','operator');
-    this.renderElements(this.buttonsForClearingContent,buttonContainerForClearingEL,'button','button','clear-buttons')
+    this.renderElements(this.buttonsForClearingContent,buttonContainerForClearingEL,'button','button','clear-buttons');
 
-    calcContainerEL.addEventListener('click',this.onClickOperators.bind(this));
-    calcContainerEL.addEventListener('click',this.onClickOperands.bind(this));
-    calcContainerEL.addEventListener('click',this.onClickButtonsForClearingContent.bind(this));
-
+    this.addListeners(calcContainerEL,'click',this.onClickOperators,this);
+    this.addListeners(calcContainerEL,'click',this.onClickOperands,this);
+    this.addListeners(calcContainerEL,'click',this.onClickButtonsForClearingContent,this);
 }
 
 let calc = new Calculator();

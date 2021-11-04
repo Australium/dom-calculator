@@ -13,8 +13,13 @@ function Calculator () {
     this.operators = ['+','-','/','*','='];
     this.numbers = [1,2,3,4,5,6,7,8,9,0];
     this.buttonsForClearingContent = ['C','X'];
-    this.storedOperands = [];
-    this.storedOperator = null;
+
+    this.storedResults = {
+        storedOperands: [],
+        storedOperator: [],
+        storedResult: [],
+        storedOperand1: '',
+    };
 
     this.addClassList = function (element,className) {
         element.classList.add(`${className}`);
@@ -51,8 +56,12 @@ function Calculator () {
         elementToBeCLeared.removeChild(elementToBeCLeared.lastChild);
     };
 
-    this.addOperandsToArray = function (passedArray,passedElement) {
-        passedArray.push(passedElement);
+    this.addValueToArray = function (passedArray,passedElement) {
+        if (passedElement === '' || passedElement === '=') {
+            return;
+        } else {
+            passedArray.push(passedElement);
+        };
     };
 
     this.clearArray = function (passedArray) {
@@ -63,78 +72,244 @@ function Calculator () {
         passedArray.pop();
     };
 
-    // this.calculate = function (array,passedEvent) {
-    //     array.forEach(element => {
-    //         if (passedEvent.target.textContent === element) {
-                
-    //         }
-    //     })
-    // };
+    this.addValueToVariable = function (passedVar,value) {
+        if (Number(value) || value == 0) {
+            return passedVar += value;
+        } else if (!Number(value)) {
+            return passedVar = value;
+        };
+    };
+
+    this.clearVariable = function (passedOperation) {
+        return passedOperation = ''; 
+    };
+
+    this.calculate = function (numberArray,operatorArray) {
+
+        let result = 0;
+
+        numberArray.forEach((e,i,array) => {
+            switch(operatorArray.length === 1 ? operatorArray[0] : operatorArray[1]) {
+                case '+': 
+                    operatorArray[0] === '-' ? result = -(-(Number(e)) + result) : result += Number(e);
+                    console.log(result);
+                    break;
+                case '-':
+                    operatorArray.length > 1 ? result = -(array[0]) : result = array[0];
+                    console.log(result);
+                    result -= Number(e);
+                    console.log(result);
+                    break;
+                case '/':
+                    operatorArray.length > 1 ? result = -(array[0]) : result = array[0];
+                    console.log(result);
+                    result /= Number(e);
+                    console.log(result);
+                    break;
+                case '*':
+                    operatorArray.length > 1 ? result = -(array[0]) : result = array[0];
+                    console.log(result);
+                    result *= Number(e);
+                    console.log(result);
+            };
+        });
+
+        this.storedResults.storedResult.push(result);
+    };
 
     this.onClickOperators = function (e) {
-        console.log(e.target)
-        console.log(this);
 
-        let itemOperator = e.target.closest('.operator');
+        let itemContainsOperator = e.target.classList.contains('operator');
         let itemOperatorTextContent = e.target.textContent;
 
-        if(e.target.classList.contains('operator')) {
+        if (this.storedResults.storedResult.length > 0) {
+            console.log(itemOperatorTextContent);
+
+            console.log('Final Result' ,this.storedResults.storedResult);
+            
+            return;
+
+        }  else if (itemOperatorTextContent === '=' && this.storedResults.storedOperator.length > 0 && this.storedResults.storedOperands.length < 1) {
+            console.log(itemOperatorTextContent);
+            return;
+
+        }  else if (itemOperatorTextContent === '=' && this.storedResults.storedOperator.length >= 1 && this.storedResults.storedOperand1.length > 0) { 
+            console.log(itemOperatorTextContent);
+
+            this.addValueToArray(this.storedResults.storedOperands,this.storedResults.storedOperand1);
+            console.log('this.storedResults.storedOperands  ',this.storedResults.storedOperands)
+
+            this.calculate(this.storedResults.storedOperands,this.storedResults.storedOperator);
+            console.log('Final Result' ,this.storedResults.storedResult);
+
             this.showElementOnScreen(itemOperatorTextContent,screenContainerEl,'span','screen-process_element');
-            // do something with operators
-            if (this.operators.includes(e.target.textContent)) {
+            this.showElementOnScreen(this.storedResults.storedResult,screenContainerEl,'span','screen-process_element');
 
-                // if(e.target.textContent === '=') {
-                //     this.calculate();
-                // };
+        } else if (this.storedResults.storedOperator.length > 0 && this.storedResults.storedOperand1.length === 0) {
+            console.log(itemOperatorTextContent);
+            return;
+            
+        } else if (itemOperatorTextContent === '-' && this.storedResults.storedOperands.length === 0 && this.storedResults.storedOperand1.length < 1) {
+            console.log(itemOperatorTextContent);
 
-                this.operators.forEach(el => {
-                    if (e.target.textContent === el) {
-                        console.log(el);
-                    }
-                });
-            }
-        }
+            this.showElementOnScreen(itemOperatorTextContent,screenContainerEl,'span','screen-process_element');
+
+            this.addValueToArray(this.storedResults.storedOperator,itemOperatorTextContent);
+
+            console.log('this.storedResults.storedOperator', this.storedResults.storedOperator);
+
+        } else if (this.storedResults.storedOperand1.length > 0
+            && this.storedResults.storedOperands.length > 0
+            && this.storedResults.storedOperator.length > 0
+            && itemOperatorTextContent !== '=') {
+                console.log(itemOperatorTextContent);
+                return;
+        } else if (this.storedResults.storedOperand1.length === 0 && this.storedResults.storedOperands.length < 1 && this.storedResults.storedOperator.length < 1) {
+            console.log(itemOperatorTextContent);
+            return;
+
+        } else if(itemContainsOperator && itemOperatorTextContent !== '=') {
+            console.log(itemOperatorTextContent);
+            this.showElementOnScreen(itemOperatorTextContent,screenContainerEl,'span','screen-process_element');
+            
+
+            this.addValueToArray(this.storedResults.storedOperator,itemOperatorTextContent);
+
+            this.addValueToArray(this.storedResults.storedOperands,this.storedResults.storedOperand1);
+            this.storedResults.storedOperand1 = this.clearVariable(this.storedResults.storedOperand1);
+
+            console.log('this.storedResults.storedOperands  ',this.storedResults.storedOperands);
+            console.log('this.storedResults.storedOperand1  ',this.storedResults.storedOperand1);
+
+            console.log('this.storedResults.storedOperator  ',this.storedResults.storedOperator);
+        };
     };
 
     this.onClickOperands = function (e) {
-            let itemOperand = e.target.closest('.operand');
-            let itemOperandTextContent = e.target.textContent;
-            this.numbers.forEach((el,i,array) => {
-                if (itemOperandTextContent == el) {
-                    console.log(el);
-                    this.showElementOnScreen(itemOperandTextContent,screenContainerEl,'span','screen-process_element');
-                    // this.storedOperands.push(el);
-                    this.addOperandsToArray(this.storedOperands,el);
-                    console.log(this.storedOperands);
-                }
-            });
+
+        let itemOperand = e.target.classList.contains('operand');
+        let itemTextContent = e.target.textContent;
+
+        if (this.storedResults.storedResult.length > 0) {
+            console.log(itemTextContent);
+            console.log('this.storedResults.storedResult.length ',this.storedResults.storedResult.length)
+            return;
+
+        } else if (this.storedResults.storedOperand1.length > 9) {
+            console.log(itemTextContent);
+
+            return;
+
+        } else if (itemOperand) {
+            console.log(itemTextContent);
+
+            this.showElementOnScreen(itemTextContent,screenContainerEl,'span','screen-process_element');
+            this.storedResults.storedOperand1 = this.addValueToVariable(this.storedResults.storedOperand1,itemTextContent);
+
+            console.log('this.storedResults.storedOperand1 ',this.storedResults.storedOperand1);
+            console.log('this.storedResults.storedOperands ',this.storedResults.storedOperands);
+        };
     };
 
     this.onClickButtonsForClearingContent = function (e) {
-        // let closetEL = e.target.closest('.clear-buttons');
-        if (e.target.textContent === this.buttonsForClearingContent[0]) {
-            console.log(e.target.textContent);
+
+        let pressedDeleteButton = e.target.textContent;
+
+        if (pressedDeleteButton === this.buttonsForClearingContent[0] 
+            && this.storedResults.storedOperands.length < 1 
+            && this.storedResults.storedOperand1.length < 1 
+            && this.storedResults.storedOperator.length < 1) {
+                console.log(pressedDeleteButton);
+                return;
+        } else if (pressedDeleteButton === this.buttonsForClearingContent[0]) {
+
+            console.log(pressedDeleteButton);
+
             this.clearContentFromContainer(screenContainerEl);
-            this.clearArray(this.storedOperands);
-            console.log(this.storedOperands);
-        } else if (e.target.textContent === this.buttonsForClearingContent[1]) {
-            console.log(e.target.textContent);
-            this.clearOnlyOneElementFromContainer(screenContainerEl);
-            this.clearArrayElement(this.storedOperands);
-            console.log(this.storedOperands);
-        }
-        // this.buttonsForClearingContent.forEach((elem,i,array) => {
-        //     if (e.target.textContent === array[0]) {
-        //         console.log(elem);
-        //         // console.log(array[0]);
-        //         // console.log(e)
-        //         this.clearContentFromContainer(screenContainerEl);
-        //     } else if (e.target.textContent === array[1]) {
-        //         console.log(array[1]);
-        //         this.clearOnlyOneElementFromContainer(screenContainerEl);
-        //         // console.log(screenContainerEl.children.length)
-        //     }
-        // })
+
+            this.clearArray(this.storedResults.storedOperands);
+            console.log(this.storedResults.storedOperands);
+
+            this.clearArray(this.storedResults.storedOperator);
+            console.log(this.storedResults.storedOperator);
+
+            this.clearArray(this.storedResults.storedResult);
+            console.log(this.storedResults.storedResult);
+
+            this.storedResults.storedOperand1 = this.clearVariable(this.storedResults.storedOperand1);
+            console.log('this.storedResults.storedOperand1 ',this.storedResults.storedOperand1);
+
+        } else if (pressedDeleteButton === this.buttonsForClearingContent[1] && this.storedResults.storedResult.length > 0) {
+            console.log(pressedDeleteButton);
+            return;
+        } else if (pressedDeleteButton === this.buttonsForClearingContent[1] 
+            && this.storedResults.storedOperands.length < 1 
+            && this.storedResults.storedOperand1.length < 1 
+            && this.storedResults.storedOperator.length < 1) {
+                console.log(pressedDeleteButton);
+                return;
+        } else if (pressedDeleteButton === this.buttonsForClearingContent[1] 
+            && this.storedResults.storedOperands.length > 0 
+            && this.storedResults.storedOperand1.length < 1 
+            && this.storedResults.storedOperator.length > 1) {
+                console.log(pressedDeleteButton);
+                this.clearOnlyOneElementFromContainer(screenContainerEl);
+                this.clearArrayElement(this.storedResults.storedOperator);
+                console.log('this.storedResults.storedOperator ',this.storedResults.storedOperator);
+        } else if (pressedDeleteButton === this.buttonsForClearingContent[1] 
+            && this.storedResults.storedOperands.length < 1 
+            && this.storedResults.storedOperand1.length > 0 
+            && this.storedResults.storedOperator.length > 0) {
+                console.log(pressedDeleteButton);
+                this.clearOnlyOneElementFromContainer(screenContainerEl);
+                this.storedResults.storedOperand1 = this.storedResults.storedOperand1.slice(0, -1);
+                console.log('this.storedResults.storedOperand1 ',this.storedResults.storedOperand1);
+        } else if (pressedDeleteButton === this.buttonsForClearingContent[1] 
+            && this.storedResults.storedOperands.length < 1 
+            && this.storedResults.storedOperand1.length < 1 
+            && this.storedResults.storedOperator.length > 0) {
+                console.log(pressedDeleteButton);
+                this.clearOnlyOneElementFromContainer(screenContainerEl);
+                this.clearArrayElement(this.storedResults.storedOperator);
+                console.log('this.storedResults.storedOperator ',this.storedResults.storedOperator);
+        } else if (pressedDeleteButton === this.buttonsForClearingContent[1] 
+            && this.storedResults.storedOperands.length > 0 
+            && this.storedResults.storedOperand1.length > 0 
+            && this.storedResults.storedOperator.length > 0) {
+                console.log(pressedDeleteButton);
+                this.clearOnlyOneElementFromContainer(screenContainerEl);
+                this.storedResults.storedOperand1 = this.storedResults.storedOperand1.slice(0, -1);
+                console.log('this.storedResults.storedOperand1 ',this.storedResults.storedOperand1);
+        } else if (pressedDeleteButton === this.buttonsForClearingContent[1] 
+            && this.storedResults.storedOperands.length > 0 
+            && this.storedResults.storedOperand1.length < 1 
+            && this.storedResults.storedOperator.length > 0) {
+                console.log(pressedDeleteButton);
+                this.clearOnlyOneElementFromContainer(screenContainerEl);
+                this.clearArrayElement(this.storedResults.storedOperator);
+                console.log('this.storedResults.storedOperator ',this.storedResults.storedOperator);
+        } else if (pressedDeleteButton === this.buttonsForClearingContent[1] 
+            && this.storedResults.storedOperands.length > 0 
+            && this.storedResults.storedOperand1.length < 1 
+            && this.storedResults.storedOperator.length < 1) {
+                console.log(pressedDeleteButton);
+                this.clearOnlyOneElementFromContainer(screenContainerEl);
+                console.log('this.storedResults.storedOperands[0]', this.storedResults.storedOperands[0]);
+                this.storedResults.storedOperand1 = this.addValueToVariable(this.storedResults.storedOperand1,this.storedResults.storedOperands[0]);
+                this.clearArrayElement(this.storedResults.storedOperands);
+                this.storedResults.storedOperand1 = this.storedResults.storedOperand1.slice(0, -1);
+                console.log('this.storedResults.storedOperand1 ',this.storedResults.storedOperand1);
+                console.log('this.storedResults.storedOperator ',this.storedResults.storedOperands);
+        } else if (pressedDeleteButton === this.buttonsForClearingContent[1] 
+            && this.storedResults.storedOperands.length < 1 
+            && this.storedResults.storedOperand1.length > 0 
+            && this.storedResults.storedOperator.length < 1) {
+                console.log(pressedDeleteButton);
+                console.log('this.storedResults.storedOperand1 ',this.storedResults.storedOperand1);
+                this.clearOnlyOneElementFromContainer(screenContainerEl);
+                this.storedResults.storedOperand1 = this.storedResults.storedOperand1.slice(0, -1);
+                console.log('this.storedResults.storedOperand1 ',this.storedResults.storedOperand1);
+        };
     };
     
     this.renderElements = function (elementsReceived,appendPlace,tag,className1,className2) {
@@ -157,7 +332,3 @@ function Calculator () {
 }
 
 let calc = new Calculator();
-
-// calc.showElementOnScreen();
-// calc.onClickOperators();
-// calc.renderElements()

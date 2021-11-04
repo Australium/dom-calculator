@@ -29,6 +29,7 @@ body {
     min-width: 450px;
     max-width: fit-content;
     min-height: 80px;
+    font-size: 22px;
 }
 
 .button {
@@ -82,4 +83,8 @@ body {
 
 .clear-button-container {
     display: flex;
+}
+
+.screen-process_element {
+    margin: 0 5px 0 0;
 }
